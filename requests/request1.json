@@ -1,0 +1,11 @@
+{
+  "request_id": "jfaksdljflae",
+  "operation": "create",
+  "user_id": "users id is here",
+  "resource_type": "job app",
+  "resource_data": {
+    "something": "information",
+    "moredata": "moredatatat"
+  }
+
+}
