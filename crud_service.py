@@ -1,7 +1,6 @@
 #test
 import json
 
-
 class CRUDService:
     def __init__(self, file="data.json"):
         self.file = file
