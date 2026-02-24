@@ -1,6 +1,8 @@
 import json
 import time
 from pathlib import Path
+import uuid
+
 
 class CRUDService:
     def __init__(self, file_contents, filename="data.json"):
@@ -9,6 +11,9 @@ class CRUDService:
         self.user_id = self.file_contents.get("user_id")
         self.resource_type = self.file_contents.get("resource_type")
         self.resource_data = self.file_contents.get("resource_data")
+        self.resource_id = self.file_contents.get("resource_id")
+        if not self.resource_id:
+            self.resource_id = str(uuid.uuid4())
 
         # setting up path to data directory
         main_dir = Path(__file__).resolve().parent  # path to main directory (contains script)
@@ -28,46 +33,138 @@ class CRUDService:
                 json.dump(self.data_held, file, indent=3)
 
     def create_resource(self):
+        """
+        TODO: Implement create method
+        """
+        try:
+            new_resource = {
+                "resource_id": self.resource_id,
+                "user_id": self.user_id,
+                "resource_type": self.resource_type,
+                "is_deleted": False,
+                "resource_data": self.resource_data
+            }
 
-        # Generating a unique resource_id using timestamps and user_id
-        resource_id = f"{self.user_id}_{int(time.time()*1000)}"
-        new_resource = {
-            "resource_id": resource_id,
-            "user_id": self.user_id,
-            "resource_type": self.resource_type,
-            "is_deleted": False,
-            "resource_data": self.resource_data
-        }
+            self.data_held.append(new_resource)
 
-        self.data_held.append(new_resource)
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
 
-        with open(self.file_path, "w") as file:
-            json.dump(self.data_held, file, indent=3)
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "Resource created successfully",
+                "code": 201,
+                "data": new_resource,
+            }
 
-        response_info = {
-            "request_id": self.request_id,
-            "status": "success",
-            "message": "Resource created successfully",
-            "code": 201,
-            "data": new_resource
-        }
+            response(response_info)
 
-        response(response_info)
+        except:
+            error_response = {
+                "request_id": "NULL",
+                "status": "fail",
+                "message": f"Error creating resource",
+                "code": 500,
+                "data": None
+            }
 
+            response(error_response)
 
     def update_resource(self):
         """
         TODO: Implement update method
         """
-        print("Updating resource")  # DELETE ME
-        pass
+        try:
+            resource = None
+            for r in self.data_held:
+                if r["resource_id"] == self.resource_id:
+                    resource = r
+                    break
+
+            # resource not found
+            if not resource:
+                response_info = {
+                    "request_id": self.request_id,
+                    "status": "fail",
+                    "message": "resource not found",
+                    "code": 404,
+                    "data": None
+                }
+                response(response_info)
+                return
+
+            # updating data file
+            resource["resource_data"] = self.resource_data
+
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
+
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "resource updated",
+                "code": 200,
+                "data": resource
+            }
+            response(response_info)
+
+        except:
+            error_response = {
+                "request_id": self.request_id,
+                "status": "fail",
+                "message": "error updating resource",
+                "code": 500,
+                "data": None
+            }
+            response(error_response)
 
     def delete_resource(self):
         """
         TODO: Implement delete method
         """
-        print("Deleting resource")  # DELETE ME
-        pass
+        try:
+            resource = None
+            for r in self.data_held:
+                if r["resource_id"] == self.resource_id:
+                    resource = r
+                    break
+
+            if not resource:
+                response_info = {
+                    "request_id": self.request_id,
+                    "status": "fail",
+                    "message": "resource not found",
+                    "code": 404,
+                    "data": None
+                }
+                response(response_info)
+                return
+
+            # delete
+            resource["is_deleted"] = True
+
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
+
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "resource deleted",
+                "code": 200,
+                "data": resource
+            }
+            response(response_info)
+
+        except:
+            error_response = {
+                "request_id": self.request_id,
+                "status": "fail",
+                "message": "error deleting resource",
+                "code": 500,
+                "data": None
+            }
+            response(error_response)
 
 
 def monitor_requests(router_fn):
@@ -133,11 +230,18 @@ def route_request(data_requested):
 
 def response(crud_response):
     """
-    TODO: Implement to generate response
     call at the end of create/update/delete
     parameter is response generated by service
     """
-    pass
+    main_dir = Path(__file__).resolve().parent  # path to main directory (contains script)
+    response_dir = main_dir / "responses"  # path to response directory (data txt files ONLY)
+    response_dir.mkdir(exist_ok=True)  # create directory if non-existant
+
+    filename = f"{crud_response["request_id"]}_response.json"
+    file_path = response_dir / filename
+
+    with open(file_path, "w") as file:
+        json.dump(crud_response, file, indent=3)
 
 
 def main():
