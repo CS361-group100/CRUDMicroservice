@@ -2,6 +2,8 @@
 import json
 import time
 from pathlib import Path
+import uuid
+
 
 class CRUDService:
     def __init__(self, file_contents, filename="data.json"):
@@ -10,6 +12,9 @@ class CRUDService:
         self.user_id = self.file_contents.get("user_id")
         self.resource_type = self.file_contents.get("resource_type")
         self.resource_data = self.file_contents.get("resource_data")
+        self.resource_id = self.file_contents.get("resource_id")
+        if not self.resource_id:
+            self.resource_id = str(uuid.uuid4())
 
         # setting up path to data directory
         main_dir = Path(__file__).resolve().parent  # path to main directory (contains script)
@@ -32,29 +37,40 @@ class CRUDService:
         """
         TODO: Implement create method
         """
-        new_resource = {
-            "resource_id": "NULL",  # GENERATE A RESOURCE ID:
-            "user_id": self.user_id,
-            "resource_type": self.resource_type,
-            "is_deleted": False,
-            "resource_data": self.resource_data
-        }
+        try:
+            new_resource = {
+                "resource_id": self.resource_id,
+                "user_id": self.user_id,
+                "resource_type": self.resource_type,
+                "is_deleted": False,
+                "resource_data": self.resource_data
+            }
 
-        self.data_held.append(new_resource)
+            self.data_held.append(new_resource)
 
-        with open(self.file_path, "w") as file:
-            json.dump(self.data_held, file, indent=3)
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
 
-        response_info = {
-            "request_id": self.request_id,
-            "status": "success",
-            "message": "Resource created successfully",
-            "code": 201,
-            "data": new_resource,
-            "is_delete": False
-        }
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "Resource created successfully",
+                "code": 201,
+                "data": new_resource,
+            }
 
-        response(response_info)
+            response(response_info)
+
+        except:
+            error_response = {
+                "request_id": "NULL",
+                "status": "fail",
+                "message": f"Error creating resource",
+                "code": 500,
+                "data": None
+            }
+
+            response(error_response)
 
 
     def update_resource(self):
@@ -68,8 +84,51 @@ class CRUDService:
         """
         TODO: Implement delete method
         """
-        print("Deleting resource")  # DELETE ME
-        pass
+        try:
+            if not self.resource_id:
+                raise ValueError("Missing 'resource_id' in request.")
+
+            resource = None
+            for r in self.data_held:
+                if r["resource_id"] == self.resource_id:
+                    resource = r
+                    break
+
+            if not resource:
+                response_info = {
+                    "request_id": self.request_id,
+                    "status": "fail",
+                    "message": "resource not found",
+                    "code": 404,
+                    "data": None
+                }
+                response(response_info)
+                return
+
+            # delete
+            resource["is_deleted"] = True
+
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
+
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "resource deleted",
+                "code": 200,
+                "data": resource
+            }
+            response(response_info)
+
+        except:
+            error_response = {
+                "request_id": self.request_id,
+                "status": "fail",
+                "message": "error deleting resource",
+                "code": 500,
+                "data": None
+            }
+            response(error_response)
 
 
 def monitor_requests(router_fn):
