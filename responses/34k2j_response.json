@@ -1,0 +1,16 @@
+{
+   "request_id": "34k2j",
+   "status": "success",
+   "message": "Resource created successfully",
+   "code": 201,
+   "data": {
+      "resource_id": "24b8d1e5-bb4c-4ff5-8625-c99ca261140d",
+      "user_id": "newid for someone",
+      "resource_type": "new app",
+      "is_deleted": false,
+      "resource_data": {
+         "something2": "information",
+         "moredata": "test"
+      }
+   }
+}

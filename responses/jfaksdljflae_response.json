@@ -1,0 +1,16 @@
+{
+   "request_id": "jfaksdljflae",
+   "status": "success",
+   "message": "Resource created successfully",
+   "code": 201,
+   "data": {
+      "resource_id": "a251da2d-9f74-4b36-b502-8096bf9304dd",
+      "user_id": "users id is here",
+      "resource_type": "job app",
+      "is_deleted": false,
+      "resource_data": {
+         "something": "information",
+         "moredata": "moredatatat"
+      }
+   }
+}
