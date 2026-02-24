@@ -72,22 +72,59 @@ class CRUDService:
 
             response(error_response)
 
-
     def update_resource(self):
         """
         TODO: Implement update method
         """
-        print("Updating resource")  # DELETE ME
-        pass
+        try:
+            resource = None
+            for r in self.data_held:
+                if r["resource_id"] == self.resource_id:
+                    resource = r
+                    break
+
+            # resource not found
+            if not resource:
+                response_info = {
+                    "request_id": self.request_id,
+                    "status": "fail",
+                    "message": "resource not found",
+                    "code": 404,
+                    "data": None
+                }
+                response(response_info)
+                return
+
+            # updating data file
+            resource["resource_data"] = self.resource_data
+
+            with open(self.file_path, "w") as file:
+                json.dump(self.data_held, file, indent=3)
+
+            response_info = {
+                "request_id": self.request_id,
+                "status": "success",
+                "message": "resource updated",
+                "code": 200,
+                "data": resource
+            }
+            response(response_info)
+
+        except:
+            error_response = {
+                "request_id": self.request_id,
+                "status": "fail",
+                "message": "error updating resource",
+                "code": 500,
+                "data": None
+            }
+            response(error_response)
 
     def delete_resource(self):
         """
         TODO: Implement delete method
         """
         try:
-            if not self.resource_id:
-                raise ValueError("Missing 'resource_id' in request.")
-
             resource = None
             for r in self.data_held:
                 if r["resource_id"] == self.resource_id:
@@ -206,7 +243,6 @@ def response(crud_response):
 
     with open(file_path, "w") as file:
         json.dump(crud_response, file, indent=3)
-
 
 
 def main():
