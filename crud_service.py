@@ -1,4 +1,3 @@
-# test
 import json
 import time
 from pathlib import Path
@@ -29,11 +28,11 @@ class CRUDService:
                 json.dump(self.data_held, file, indent=3)
 
     def create_resource(self):
-        """
-        TODO: Implement create method
-        """
+
+        # Generating a unique resource_id using timestamps and user_id
+        resource_id = f"{self.user_id}_{int(time.time()*1000)}"
         new_resource = {
-            "resource_id": "NULL",  # GENERATE A RESOURCE ID:
+            "resource_id": resource_id,
             "user_id": self.user_id,
             "resource_type": self.resource_type,
             "is_deleted": False,
