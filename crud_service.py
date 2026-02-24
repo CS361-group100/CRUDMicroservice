@@ -3,7 +3,6 @@ import json
 import time
 from pathlib import Path
 
-
 class CRUDService:
     def __init__(self, file_contents, filename="data.json"):
         self.file_contents = file_contents
