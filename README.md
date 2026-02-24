@@ -83,7 +83,7 @@ Requests must be valid JSON written to a request files in the requests/ director
 * Response: status = "success", code = 200, data = updated resource object
 * Error: Resource not found → status = "fail", code = 404, data = null
 
-###Delete:
+### Delete:
 * Input: operation = "delete" + resource_id
 * Action: Sets is_deleted = True for the resource in data.json
 * Response: status = "success", code = 200, data = deleted resource object
@@ -135,6 +135,6 @@ responses/response_*.json
      v
 Client Program
 
-#Authors
+# Authors
 Banks
 CW
