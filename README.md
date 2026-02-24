@@ -135,6 +135,9 @@ responses/response_*.json
      v
 Client Program
 
+<img width="542" height="287" alt="image" src="https://github.com/user-attachments/assets/438316d5-b1a5-4812-bc83-d3b6e21ee9b5" />
+
+
 # Authors
 Banks
 CW
